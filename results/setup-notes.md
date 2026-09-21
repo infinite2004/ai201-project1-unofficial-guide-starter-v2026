@@ -24,10 +24,13 @@
 - Setup notes and test questions were committed and pushed to
   `https://github.com/infinite2004/ai201-project1-unofficial-guide-starter-v2026`.
 
-## Still required
+## Milestone 2 document status
 
-1. Write your two original acceptance criteria and reasons for all five, as
-   required by the instructions. `criteria.md` is unchanged pending your wording.
-2. Pressure-test the completed criteria and commit/push the milestone work.
+`criteria.md` now contains five targets, five reasons, and explicit test methods.
+`results/milestone-2-design-notes.md` records criterion options, 15 ranked reasons,
+and a local measurability review. These were drafted and selected by Codex at the
+student's request. The assignment's student-authorship requirement and review
+against the inaccessible course self-check remain for the student; no evaluation
+results or student authorship are claimed.
 
 Activate the environment in each new terminal with `source .venv/bin/activate`.

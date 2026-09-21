@@ -1,42 +1,50 @@
 # Acceptance criteria — The Unofficial Guide
 
-Five criteria that say what "working" means for this system, written in unit 1
-**before** any results existed.
+These targets cover the `campus_life` corpus. They were completed before
+Milestone 3 changes, Milestone 4 tuning, or evaluation of the five test questions.
+The starter setup and one housing-lottery smoke question had already run.
 
-An acceptance criterion names a target: a number, a count, a rate, or something
-a person could plainly observe. *"Retrieval works"* is an opinion. *"For at
-least 4 of my 5 test questions, the top results include a chunk containing the
-answer"* is a criterion.
+**Authorship:** Codex drafted and selected these criteria and reasons at the
+student's request. They are not represented as independently student-written.
+The assignment asks for student-authored criteria; student review and ownership
+of these choices remain necessary before submission.
 
-Under each one, write a sentence or two on **why that target** and not a
-stricter or looser one. A reason that says something about your corpus or your
-pipeline earns credit; *"80% seemed reasonable"* does not.
+## Test scope
 
-> Missing your own targets next unit costs you nothing. Setting a target so
-> easy you can't miss it does.
-
----
+Use the five entries in `QUESTIONS` and five entries in `OUT_OF_SCOPE` in
+`questions.py`. Record the corpus, chunker, top-k, and threshold with each run.
+For generation criteria, use three uncached answers per in-scope question
+(15 outputs). These are targets and test plans, not measured results.
 
 ## 1. Retrieved chunks contain the answer
 
 For at least 4 of my 5 test questions, the retrieved chunks include one that
 contains the answer.
 
-**Why this target:**
-<!-- e.g. "One of my questions is about a topic only two documents mention, so
-     I expect that one to be hard." -->
+**Why this target:** The questions ask for specific facts, but the corpus has
+similar posts about different dorms and dining halls that can compete in search.
+Four of five permits one such retrieval miss; a lower target would leave too
+many everyday questions without evidence, while five of five allows no miss.
 
----
+**How to test:** Retrieve once for each question using the recorded top-k.
+Count a question as passing only when at least one returned chunk directly
+states its answer about the correct location or policy. Require at least four
+passes; the `expects` phrase is a clue, not sufficient proof by itself.
 
 ## 2. Every answer names a source
 
 Every answer the system produces names at least one source document.
 
-**Why this target:**
-<!-- Why all five and not four? What about your setup makes that achievable —
-     or what would have to go wrong for it not to be? -->
+**Why this target:** The pipeline already supplies source filenames, so every
+substantive answer should make its evidence traceable. Allowing even one
+uncited answer would remove that check for a user; requiring multiple sources
+would be unnecessary when one short post contains the whole answer.
 
----
+**How to test:** For each of the 15 outputs, check that the answer text itself
+names at least one filename supplied in its retrieved context. A separate
+retrieved-sources list does not count. All substantive answers must pass.
+A gate refusal is not a substantive answer and is assessed under criterion 3;
+it still counts as a failure under criterion 5 for an in-scope question.
 
 ## 3. The relevance gate stops out-of-corpus questions
 
@@ -44,56 +52,55 @@ When I ask a question my documents clearly don't cover, the relevance gate
 stops it and the system returns "I don't have enough information about that" —
 in at least 4 of 5 tries.
 
-<!-- The five questions are the ones in `OUT_OF_SCOPE` at the bottom of
-     `questions.py`, and `run_eval.py` puts them through the gate and writes
-     what happened into your run log. Swap them for your own if you'd rather —
-     just keep five of them, or the "4 of 5" above has nothing to be 4 of. -->
+**Why this target:** These documents cover campus life, so unrelated questions
+should usually stop before generation. Four of five permits one accidental
+semantic match while demanding rejection of most unsupported questions; five
+of five would allow none, and three of five would tolerate two unsupported calls.
 
-**Why this target:**
-<!-- What did your distances look like when you set the cutoff in Milestone 4?
-     Was there a clean gap, or did the two groups overlap? -->
+**How to test:** Run each of the five distinct `OUT_OF_SCOPE` questions once
+with the recorded threshold. Count a pass only when the gate rejects the
+question before generation and returns `gate.REFUSAL` exactly (including its
+final period). Require at least four passes; repeating one question five times
+does not supply five distinct cases.
 
----
+## 4. Chunks retain complete facts and their subject
 
-## 4. Something about your chunks
+At least 4 of the 5 chunks printed by `python app.py chunks -n 5` must contain
+at least one complete factual sentence, begin and end at a sentence or paragraph
+boundary in the source, and identify the relevant place, course, or policy in
+the chunk text without requiring a neighboring chunk.
 
-<!-- YOU WRITE THIS ONE.
+**Why this target:** Campus posts often put an actionable fact in one sentence
+and its subject in a title. Requiring both protects meaning when posts are split;
+four of five allows one awkward boundary, while a length-only target could reward
+fragments and a perfect score would allow no exception in the sample.
 
-     How would you know if your chunks were the right size? Name something
-     countable or observable.
+**How to test:** Save the five printed chunks with their sources and function
+name. For each, compare its boundaries with the source and mark all three checks:
+complete factual sentence, intact boundaries, and explicit subject in the text.
+A chunk passes only if all three checks pass. Require four passing chunks.
 
-     Examples of the right shape — don't copy these, they should come from
-     what you actually saw in Milestone 3:
-       - "At least 4 of 5 sampled chunks read as a complete thought, with no
-          sentence cut in half at either end."
-       - "No chunk is shorter than 200 characters, since anything below that
-          in my corpus turned out to be a heading with no content under it." -->
+## 5. Answers preserve the requested fact without unsupported claims
 
+For at least 4 of the 5 in-scope questions, all three uncached answers must state
+the correct requested fact, include the question's `expects` phrase (ignoring
+case and repeated whitespace), and contain no factual claim unsupported by the
+retrieved chunks. An in-scope refusal counts as a failure.
 
+**Why this target:** Laundry prices, dining wait times, and administrative rules
+must retain their details to be useful. Requiring three consistent answers for
+four questions checks reliability while allowing one difficult question; accepting
+one lucky answer would hide variation, while five of five would permit none.
 
-**Why this target:**
-
-
-
----
-
-## 5. Your choice
-
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. It could be about
-     speed, about refusals, about a particular kind of question your corpus
-     handles badly, about source attribution being correct rather than merely
-     present — anything, as long as it names a number or an observable
-     outcome. -->
-
-
-
-**Why this target:**
-
-
+**How to test:** Compare each of the 15 answers with its question and retrieved
+context. Check the expected phrase, the correctness of the requested fact, and
+support for every factual claim. A question passes only if all three answers
+pass every check. Require at least four passing questions.
 
 ---
+
+Missing a target is a result to diagnose, not a reason to lower it. Preserve
+these originals when documenting any later clarification.
 
 <!-- ─────────────────────────────────────────────────────────────────────────
      UNIT 2 — read this before you change anything above.
