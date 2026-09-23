@@ -39,3 +39,21 @@ run. Independent student authorship and completion of the inaccessible course
 self-check are not claimed.
 
 Activate the environment in each new terminal with `source .venv/bin/activate`.
+
+## Milestones 3–5 — September 23, 2026
+
+- Milestone 3: implemented paragraph/sentence chunking with repeated titles,
+  a 400-character soft target, and zero body overlap; indexed 100 chunks and
+  included five actual samples with source and function labels in the README.
+- Milestone 4: measured five covered and five unrelated queries; set top-k to
+  4 and the distance cutoff to 0.69. Captured a sourced live answer and verified
+  all five off-topic questions stop before generation.
+- Verification: four chunker tests and the supplied smoke checks passed. The
+  smoke checks used fake models and a temporary index; retrieval measurements
+  and the captured answer used real models.
+- Milestone 5: completed all five Unit 1 README sections with actual text,
+  measurements, AI-use details, and the fork URL. Unit 2 placeholders remain
+  intentionally unfilled; its three-run evaluation has not been performed.
+- Course Portal submission remains pending because computer access to Safari
+  was denied. No submission receipt or completion of the course self-check is
+  claimed. The student-authorship limitation remains disclosed in criteria.md.

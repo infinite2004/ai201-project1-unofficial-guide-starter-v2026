@@ -178,9 +178,50 @@ Evidence: [all retrieved chunks and distances](results/milestone-4-retrieval.md)
 
 ## How I Used AI
 
-To be completed with the final implementation and verification details in
-Milestone 5. The implementation, criteria drafting, and source review so far
-were AI-assisted; independent student authorship is not claimed.
+**1. Turning the chunking milestone into working code.** I asked Codex to finish
+Milestones 3–5. It inspected the starter's 88-document/88-chunk baseline, recorded
+a 400-character soft target with zero body overlap before coding, and implemented
+paragraph/sentence splitting with the original title repeated. The resulting
+change was from generic fixed windows to `chunker.py::split_documents`; Codex
+also added tests for lost text, decimal prices, and oversized sentences and
+pasted five actual samples into this README. I delegated those decisions and
+edits rather than independently writing or manually correcting the function.
+The original fallback remains available, and no retrieval improvement over the
+baseline is claimed without a controlled comparison.
+
+**2. Turning retrieval observations into a documented cutoff.** In the same
+request, I asked Codex to complete retrieval tuning and the write-up. It returned
+all ten measured best distances, full retrieved chunks, and a sourced Gemini
+answer. It changed the starter's cutoff from 0.6 to 0.69 and top-k from 5 to 4
+based on those observations, then verified five refusals without generation.
+I used the AI-produced implementation and evidence; I did not manually revise
+its measurements or conduct an independent breakout review. Codex retained the
+existing grounding instruction because the inspected sample stayed within its
+sources, and documented that one successful answer does not prove consistency.
+
+Codex also drafted the Milestone 2 criteria at my request. Their AI authorship
+is disclosed in `criteria.md`; this is not a claim that the course's requirement
+for independently student-authored criteria has been satisfied. Likewise, the
+linked course self-check was not accessible and has not been marked complete.
+
+**Verification:** Four chunker regression tests passed. The supplied pipeline
+smoke test passed for all four corpora using fake embeddings and fake generation
+in a temporary vector store, keeping those checks separate from the live index.
+The distances and sample answer above used the real embedding model and Gemini.
+The full three-run Unit 2 evaluation has not been run.
+
+**Run locally:** Use Python 3.11–3.13. Create `.venv`, install `requirements.txt`,
+and copy `.env.example` to `.env` with your own key. Then activate the environment
+and run `python app.py index` followed by `python app.py ask "your question"`.
+See [RUNNING.md](RUNNING.md) for all commands. Secrets and local indexes are
+excluded from Git.
+
+**Submission URL:** https://github.com/infinite2004/ai201-project1-unofficial-guide-starter-v2026
+
+The Unit 1 repository work is ready for review. The Course Portal submission
+has **not** been made: browser access was denied in this session. Submit the URL
+above through the course's project submission page. Keep this same repository
+for Unit 2 so its history remains available.
 
 ---
 
