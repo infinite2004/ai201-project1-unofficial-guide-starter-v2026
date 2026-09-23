@@ -17,8 +17,8 @@ fictional course documents, not official guidance for a real university.
 
 ## Chunking Strategy
 
-**Chunk size:** 400-character soft target, including the title.  
-**Overlap:** 0 body characters; repeat the original title in every split chunk.  
+**Chunk size:** 400-character soft target, including the title.
+**Overlap:** 0 body characters; repeat the original title in every split chunk.
 **Function:** `chunker.py::split_documents`.
 
 The starter's 800-character windows with 120-character overlap produced 88 chunks
@@ -106,7 +106,75 @@ the printed samples, not feedback from a breakout group.
 
 ## Sample Answer
 
-Pending the Milestone 4 retrieval measurements and live answer check.
+**Question:** What are the peak wait times at Pellew Dining Hall?
+
+**Answer (complete captured output, including source lines):**
+
+```text
+At Pellew Dining Hall, the peak wait times are 12 to 18 minutes.
+
+Source: `dining_pellew_dining_hall.txt` (also mentioned in `dining_pellew_dining_hall_followup.txt`).
+
+Sources retrieved: dining_halden_hall_followup.txt, dining_pellew_dining_hall.txt, dining_pellew_dining_hall_followup.txt, dining_the_ridgeway_cafe_followup.txt
+```
+
+**My relevance cutoff:** `0.69` (cosine distance; lower is closer).
+**Top-k:** `4`.
+
+| Question | In corpus? | Best distance |
+|---|---|---|
+| What determines housing lottery priority for juniors and seniors before random tie-breaking? | Yes | 0.208684 |
+| What signature is required to withdraw from a course? | Yes | 0.558321 |
+| What are the peak wait times at Pellew Dining Hall? | Yes | 0.197579 |
+| How much does one wash cost in Morrow House's laundry room? | Yes | 0.195130 |
+| Which mornings are best for doing laundry in Morrow House? | Yes | 0.283633 |
+| What is the capital of Mongolia? | No | 0.824593 |
+| How do I change the oil in a diesel engine? | No | 0.923117 |
+| Who won the 1994 World Cup? | No | 0.885860 |
+| What is the recommended dosage of ibuprofen for a headache? | No | 0.844232 |
+| How do I write a for loop in Rust? | No | 0.890692 |
+
+The highest in-corpus distance was 0.558321; the lowest out-of-corpus distance
+was 0.824593. Their midpoint is about 0.691457, so I chose 0.69. All five
+covered questions pass and all five unrelated questions are refused at this
+cutoff. A cutoff of 0.3 would wrongly refuse the withdrawal question; a cutoff
+of 0.9 would admit four of these unrelated questions. This is calibration on
+ten known questions, not a guarantee for unseen questions near the boundary.
+
+I first inspected five results per question. All five answer-bearing chunks
+were already ranked first. The first three queries retrieved the housing
+lottery policy, withdrawal policy, and Pellew wait-time post respectively;
+these directly answered the questions rather than merely sharing words.
+Lower ranks included distracting material: statistics exams for the lottery
+question, unrelated course assessment for withdrawal, and other dining halls
+for the Pellew question. Reducing top-k from 5 to 4 removed the last result
+while retaining some supporting context. Other locations still appear in
+context, so the model must respect the named subject; the gate checks only
+the best distance, not the relevance of every returned chunk.
+
+I inspected `GROUNDING_INSTRUCTION` in `generate.py` and the exact prompt printed
+by `--show-prompt`. It already requires source-only information, refusal when
+unsupported, a filename, and brevity. The sample preserved Pellew's 12–18-minute
+range rather than borrowing a different hall's time, so I retained the instruction.
+One successful answer does not establish the three-run accuracy criterion.
+
+**Off-topic check:**
+
+```text
+Question: What is the capital of Mongolia?
+I don't have enough information about that.
+```
+
+All five `OUT_OF_SCOPE` questions were also checked through the actual retrieval
+and gate pipeline with generation replaced by a function that raises if called.
+They all returned the exact refusal; generation was called zero times. A separate
+CLI run confirmed the displayed refusal and zero model calls.
+
+Evidence: [all retrieved chunks and distances](results/milestone-4-retrieval.md),
+[machine-readable measurements](results/milestone-4-retrieval.json),
+[initial top-5 exploration](results/milestone-4-top5-exploration.json),
+[complete prompt and live answer](results/milestone-4-sample-answer.txt), and
+[gate outcomes](results/milestone-4-refusals.json).
 
 ## How I Used AI
 

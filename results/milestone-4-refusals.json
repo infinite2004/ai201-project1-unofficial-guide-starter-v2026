@@ -1,0 +1,51 @@
+{
+  "threshold": 0.69,
+  "generation_calls": 0,
+  "results": [
+    {
+      "question": "What is the capital of Mongolia?",
+      "refused": true,
+      "best_distance": 0.824593186378479,
+      "threshold": 0.69,
+      "sources": [],
+      "prompt": null,
+      "answer": "I don't have enough information about that."
+    },
+    {
+      "question": "How do I change the oil in a diesel engine?",
+      "refused": true,
+      "best_distance": 0.9231168031692505,
+      "threshold": 0.69,
+      "sources": [],
+      "prompt": null,
+      "answer": "I don't have enough information about that."
+    },
+    {
+      "question": "Who won the 1994 World Cup?",
+      "refused": true,
+      "best_distance": 0.8858600854873657,
+      "threshold": 0.69,
+      "sources": [],
+      "prompt": null,
+      "answer": "I don't have enough information about that."
+    },
+    {
+      "question": "What is the recommended dosage of ibuprofen for a headache?",
+      "refused": true,
+      "best_distance": 0.8442317247390747,
+      "threshold": 0.69,
+      "sources": [],
+      "prompt": null,
+      "answer": "I don't have enough information about that."
+    },
+    {
+      "question": "How do I write a for loop in Rust?",
+      "refused": true,
+      "best_distance": 0.8906915187835693,
+      "threshold": 0.69,
+      "sources": [],
+      "prompt": null,
+      "answer": "I don't have enough information about that."
+    }
+  ]
+}

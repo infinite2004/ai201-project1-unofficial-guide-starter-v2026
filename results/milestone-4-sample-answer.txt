@@ -1,0 +1,60 @@
+  (best distance 0.198, cutoff 0.69)
+
+======================================================================
+System instruction sent with the prompt
+======================================================================
+You answer questions using only the documents provided to you.
+
+Rules:
+- Use only the information in the documents below. Do not use anything you know from elsewhere.
+- If the documents don't cover the question, say you don't have enough information. Do not guess.
+- Name the document your answer came from, using the filename given in each excerpt.
+- Be brief. Two or three sentences is usually enough.
+
+======================================================================
+The assembled prompt, exactly as sent
+======================================================================
+Documents:
+
+[from dining_pellew_dining_hall_followup.txt]
+Re: Pellew Dining Hall
+
+Adding to what people have said about Pellew Dining Hall. The wait figure of 12 to 18 minutes at peak matches what I've seen. If you're trying to eat between classes, go before 11:45 and it's a different building entirely.
+
+Also worth saying: the furthest hall from anywhere, next to the athletics centre. Nobody tells you this at orientation.
+
+[from dining_pellew_dining_hall.txt]
+Pellew Dining Hall
+
+Second-year here. Wait times: 12 to 18 minutes at peak, and the peak is early — 11:45 to 12:30. The thing worth going for is a dedicated allergen-free station staffed by someone who knows the menu. The thing to know is that the furthest hall from anywhere, next to the athletics centre.
+
+Hours are 7:00am to 8:00pm daily. Costs one meal swipe, or $11.75 cash.
+
+[from dining_halden_hall_followup.txt]
+Re: Halden Hall
+
+Adding to what people have said about Halden Hall. The wait figure of rarely more than 8 minutes matches what I've seen. If you're trying to eat between classes, go before 11:45 and it's a different building entirely.
+
+Also worth saying: closes at 7:00pm, which catches people out. Nobody tells you this at orientation.
+
+[from dining_the_ridgeway_cafe_followup.txt]
+Re: The Ridgeway Café
+
+Adding to what people have said about The Ridgeway Café. The wait figure of 10 to 15 minutes at 12:30 matches what I've seen. If you're trying to eat between classes, go before 11:45 and it's a different building entirely.
+
+Also worth saying: seating is tight; about 40 seats for a building of 900. Nobody tells you this at orientation.
+
+---
+
+Question: What are the peak wait times at Pellew Dining Hall?
+
+Answer using only the documents above, and name the file you used.
+======================================================================
+
+At Pellew Dining Hall, the peak wait times are 12 to 18 minutes.
+
+Source: `dining_pellew_dining_hall.txt` (also mentioned in `dining_pellew_dining_hall_followup.txt`).
+
+Sources retrieved: dining_halden_hall_followup.txt, dining_pellew_dining_hall.txt, dining_pellew_dining_hall_followup.txt, dining_the_ridgeway_cafe_followup.txt
+
+1 model calls this session, 650 tokens (593 in, 57 out)
