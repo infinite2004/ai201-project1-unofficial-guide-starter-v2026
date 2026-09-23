@@ -1,27 +1,10 @@
-"""
-Stage 2 of the pipeline: splitting documents into chunks.
+"""Stage 2: paragraph- and sentence-aware chunks for short campus posts.
 
-⚠️ THIS IS THE FILE YOU CHANGE IN MILESTONE 3.
-
-`split_documents` below is deliberately plain. It cuts every document into
-fixed-size pieces with a fixed overlap and pays no attention to where sentences
-or paragraphs end. It works, and it is not good.
-
-On a corpus of short posts it may not cut anything at all: `campus_life` comes
-out as 88 documents and 88 chunks, because almost nothing in it reaches 800
-characters. That is the baseline, not a bug — Milestone 3 is where you decide
-whether one post should stay one chunk.
-
-Your job in Milestone 3 is to replace the *body* of `split_documents` with a
-strategy that fits the documents you actually read in Milestone 1. Keep the
-name and the shape of what it returns — the rest of the pipeline calls it, and
-your README has to name the function that produced your chunks.
-
-If you get stuck for 30 minutes, `fallback_split` is the original. Switch back
-to it, write down what you saw, and move on. That's a real observation about
-your pipeline, not giving up.
+The original fixed-window fallback is retained for comparison. The active
+splitter repeats a short document title and preserves whole sentences.
 """
 
+import re
 from dataclasses import dataclass
 
 import config
@@ -81,23 +64,60 @@ def fallback_split(
 
 
 def split_documents(documents: list[Document]) -> list[Chunk]:
+    """Pack paragraphs under a soft size target, retaining the title as context.
+
+    Oversized paragraphs are packed by sentence. Oversized single sentences
+    remain intact. There is no body overlap; only the title repeats.
     """
-    Split documents into chunks. ⚠️ REPLACE THE BODY OF THIS IN MILESTONE 3.
+    if config.CHUNK_SIZE <= 0:
+        raise ValueError("chunk_size must be positive")
+    if config.CHUNK_OVERLAP != 0:
+        raise ValueError("split_documents uses zero body overlap")
 
-    Right now it just calls the fallback. That is the plain, generic behaviour
-    the brief is talking about.
+    chunks: list[Chunk] = []
+    for doc in documents:
+        paragraphs = [p.strip() for p in re.split(r"\n\s*\n", doc.text.strip())
+                      if p.strip()]
+        if not paragraphs:
+            continue
+        title = ""
+        if (len(paragraphs) > 1 and "\n" not in paragraphs[0]
+                and len(paragraphs[0]) <= 120
+                and not paragraphs[0].endswith((".", "!", "?"))):
+            title = paragraphs.pop(0)
+        prefix = title + "\n\n" if title else ""
+        budget = max(1, config.CHUNK_SIZE - len(prefix))
+        pieces: list[str] = []
+        current = ""
 
-    When you write your own strategy, set `produced_by` to
-    "chunker.py::split_documents" so your README's Sample Chunks section names
-    the right function. `app.py chunks` prints that string for you.
+        def add(unit: str, separator: str):
+            nonlocal current
+            candidate = current + separator + unit if current else unit
+            if current and len(candidate) > budget:
+                pieces.append(current)
+                current = unit
+            else:
+                current = candidate
 
-    Things worth thinking about before you write any code:
-      - Are your documents short posts or long guides?
-      - Is the useful information in one sentence, or spread over a paragraph?
-      - Would splitting on paragraph breaks keep more thoughts intact than
-        splitting on a character count?
-    """
-    return fallback_split(documents)
+        for paragraph in paragraphs:
+            if len(paragraph) <= budget:
+                add(paragraph, "\n\n")
+            else:
+                # Decimal prices are safe: the dot in $1.50 has no following
+                # whitespace. This is deliberately a lightweight English rule.
+                sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z0-9"“])', paragraph)
+                for i, sentence in enumerate(sentences):
+                    add(sentence, "\n\n" if i == 0 else " ")
+        if current:
+            pieces.append(current)
+        for index, piece in enumerate(pieces):
+            chunks.append(Chunk(
+                text=prefix + piece,
+                source=doc.source,
+                index=index,
+                produced_by="chunker.py::split_documents",
+            ))
+    return chunks
 
 
 def describe(chunks: list[Chunk]) -> str:

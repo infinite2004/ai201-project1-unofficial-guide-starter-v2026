@@ -1,129 +1,118 @@
 # The Unofficial Guide
 
-<!-- Replace this line with your name and which corpus you picked. -->
+Author: infinite2004 · Corpus: `campus_life`
 
-> **This file is your submission.** Fill it in as you go — most sections get
-> written during the milestone that produces them, not at the end.
->
-> How the starter works, and every command you'll need, is in `RUNNING.md`.
-> Leave that file alone.
->
-> **Paste everything as text.** No screenshots, no video. A typed table gets
-> full credit; a picture of the same table gets none.
->
-> Delete these instruction blocks as you replace them. The `<!-- -->` comments
-> are notes to you and don't show up when the page renders — you can leave them
-> or remove them.
-
----
+Project: https://github.com/infinite2004/ai201-project1-unofficial-guide-starter-v2026
 
 # Unit 1
 
 ## What This Does
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
-
-     Milestone 5. -->
+The Unofficial Guide answers questions using 88 short campus-life documents.
+It covers housing, dining, courses, and university procedures, including laundry
+prices, dining wait times, and withdrawal requirements. It retrieves relevant
+excerpts locally and asks Gemini to write a brief answer naming its source.
+A relevance gate refuses questions when no excerpt is close enough; these are
+fictional course documents, not official guidance for a real university.
 
 ## Chunking Strategy
 
-**Chunk size:**
-**Overlap:**
+**Chunk size:** 400-character soft target, including the title.  
+**Overlap:** 0 body characters; repeat the original title in every split chunk.  
+**Function:** `chunker.py::split_documents`.
 
-<!-- What about YOUR documents made you pick these numbers? Short posts and
-     long sectioned guides don't want the same chunking, and "800 seemed
-     reasonable" earns nothing. Point at something you noticed when you read
-     the documents in Milestone 1.
+The starter's 800-character windows with 120-character overlap produced 88 chunks
+from 88 posts: average 317 characters, shortest 178, longest 549. It never split
+a post. I kept short posts whole and changed longer ones to split at paragraph
+boundaries, or sentence boundaries when a paragraph exceeds the target. Titles
+travel with every chunk so a price or schedule still identifies its subject.
+An oversized single sentence stays intact rather than being cut to fit.
 
-     If you changed your mind partway through, say so and say why. That's worth
-     more than pretending you got it right first time.
+The target sits above the original mean but below the longest posts, allowing
+separate paragraphs in longer posts to come apart. No body overlap is needed
+for these short facts; repeated sentences could crowd the search results.
+The implementation produced 100 chunks: mean 282 characters, shortest 116,
+longest 400. A short complete fact is acceptable; size alone is not quality.
+The original `fallback_split` is retained for comparison. The lightweight English
+sentence rule is not a general-purpose parser for every abbreviation.
 
-     Milestone 3. -->
+The decision was recorded before implementation in
+[the chunking plan](results/milestone-3-plan.md). Four regression tests passed,
+including preservation of all campus body text without duplication, decimal
+prices, empty input, and an oversized sentence. This does not establish a
+retrieval improvement over the baseline.
 
 ## Sample Chunks
 
-<!-- Five chunks, pasted as text. Label each one and name the file it came from
-     AND the function that produced it — the grader checks your code against
-     what you claim here.
+These are the five samples printed by `python app.py chunks -n 5`.
 
-     `python app.py chunks -n 5` prints all three for you. Copy them straight
-     across.
+**Chunk 1** — source: `admin_add_drop_deadline.txt#0` — produced by: `chunker.py::split_documents`
 
-     Milestone 3. -->
+```text
+On the add/drop deadline
 
-**Chunk 1** — source: `` — produced by: ``
-
-```
+You can add a course through the end of the second week. Dropping is a longer window — through the end of week six — but a drop after week two shows as a W on your transcript. Nothing anywhere on the registrar's site says this plainly, and students find out from each other.
 ```
 
-**Chunk 2** — source: `` — produced by: ``
+**Chunk 2** — source: `course_cs_210.txt#0` — produced by: `chunker.py::split_documents`
 
-```
-```
+```text
+CS 210 Data Structures
 
-**Chunk 3** — source: `` — produced by: ``
+I'm a junior and I've done this twice now. Format is lecture with weekly labs; slides go up after class, not before. Assessment: two midterms and a final, all drawn from lecture material rather than the textbook. Midterms are curved, the final is not.
 
-```
-```
-
-**Chunk 4** — source: `` — produced by: ``
-
-```
+Expect 8 to 10 hours a week outside class.
 ```
 
-**Chunk 5** — source: `` — produced by: ``
+**Chunk 3** — source: `course_math_220_workload.txt#0` — produced by: `chunker.py::split_documents`
 
+```text
+Workload for MATH 220 Linear Algebra
+
+People keep asking so: 6 to 8 hours a week, almost all of it on problem sets. That's real time, not optimistic time.
+
+It's front-loaded — the first month is heavier than the rest, partly because you're learning the format.
 ```
+
+**Chunk 4** — source: `dining_the_ridgeway_cafe_followup.txt#0` — produced by: `chunker.py::split_documents`
+
+```text
+Re: The Ridgeway Café
+
+Adding to what people have said about The Ridgeway Café. The wait figure of 10 to 15 minutes at 12:30 matches what I've seen. If you're trying to eat between classes, go before 11:45 and it's a different building entirely.
+
+Also worth saying: seating is tight; about 40 seats for a building of 900. Nobody tells you this at orientation.
 ```
+
+**Chunk 5** — source: `housing_morrow_house.txt#0` — produced by: `chunker.py::split_documents`
+
+```text
+Morrow House — what it's actually like
+
+Just finished a year in this building. Built 1954, partially renovated 2008. Rooms are singles and doubles, hall bathrooms.
+
+The good: cheapest housing tier by about $900 a year, and the singles are real singles.
+
+The bad: known damp problem on the ground floor; two rooms were taken offline in 2024.
+```
+
+All five identify their subject, contain complete factual sentences, and start
+and end at sentence or paragraph boundaries. Read independently, the first three
+can answer: “When can I add a course?”, “Are CS 210 finals curved?”, and “How many
+hours per week does MATH 220 take?” The fourth states when to avoid a café queue;
+the fifth describes Morrow House's room types and damp problem. Each can answer
+at least one concrete question without another chunk. This is an AI review of
+the printed samples, not feedback from a breakout group.
 
 ## Sample Answer
 
-<!-- One complete question and answer, pasted as text, with the source line
-     visible. Milestone 4. -->
-
-**Question:**
-
-**Answer:**
-
-```
-```
-
-**My relevance cutoff:**
-
-<!-- The number you set in config.py, and how you got there.
-
-     You ran five questions your corpus covers and the five in OUT_OF_SCOPE
-     that it clearly doesn't, and wrote down the best distance for each. What
-     did those two groups look like? Where was the gap? Put the actual numbers
-     here — the table below wants all ten rows.
-
-     Milestone 4. -->
-
-| Question | In corpus? | Best distance |
-|---|---|---|
-|  |  |  |
+Pending the Milestone 4 retrieval measurements and live answer check.
 
 ## How I Used AI
 
-<!-- Two specific moments. For each: what you asked for, what came back, and
-     what you changed about it.
-
-     "I asked Claude to write the chunking function from my notes. It ignored
-     the overlap, so I added that myself" is the level of detail we're after.
-     "I used AI to help me code" is not.
-
-     Milestone 5. -->
-
-**1.**
-
-**2.**
-
-<!-- ── Stretch features ─────────────────────────────────────────────────────
-     Doing one? Say so here BEFORE you start. A feature this README never
-     claims earns nothing.
-     ───────────────────────────────────────────────────────────────────────── -->
+To be completed with the final implementation and verification details in
+Milestone 5. The implementation, criteria drafting, and source review so far
+were AI-assisted; independent student authorship is not claimed.
 
 ---
 
