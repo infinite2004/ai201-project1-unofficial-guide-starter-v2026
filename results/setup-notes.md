@@ -28,9 +28,14 @@
 
 `criteria.md` now contains five targets, five reasons, and explicit test methods.
 `results/milestone-2-design-notes.md` records criterion options, 15 ranked reasons,
-and a local measurability review. These were drafted and selected by Codex at the
-student's request. The assignment's student-authorship requirement and review
-against the inaccessible course self-check remain for the student; no evaluation
-results or student authorship are claimed.
+and a local measurability review. `results/milestone-2-review.md` contains the
+full review and source checks for all five questions. On September 23, 2026,
+the student authorized applying the completed AI-assisted wording for criteria
+4 and 5. All five criteria have targets, reasons, and test procedures; all five
+questions have expected phrases verified against the source documents.
+
+The repository deliverables for Milestone 2 are complete. No evaluation has been
+run. Independent student authorship and completion of the inaccessible course
+self-check are not claimed.
 
 Activate the environment in each new terminal with `source .venv/bin/activate`.

@@ -6,8 +6,8 @@ The starter setup and one housing-lottery smoke question had already run.
 
 **Authorship:** Codex drafted and selected these criteria and reasons at the
 student's request. They are not represented as independently student-written.
-The assignment asks for student-authored criteria; student review and ownership
-of these choices remain necessary before submission.
+The student authorized applying the completed draft on September 23, 2026.
+This records approval of AI-assisted wording, not independent student authorship.
 
 ## Test scope
 
@@ -70,10 +70,11 @@ at least one complete factual sentence, begin and end at a sentence or paragraph
 boundary in the source, and identify the relevant place, course, or policy in
 the chunk text without requiring a neighboring chunk.
 
-**Why this target:** Campus posts often put an actionable fact in one sentence
-and its subject in a title. Requiring both protects meaning when posts are split;
-four of five allows one awkward boundary, while a length-only target could reward
-fragments and a perfect score would allow no exception in the sample.
+**Why this target:** My campus documents are short posts that often name their
+subject in a title and explain useful facts in a few sentences. A fact can become
+confusing if splitting removes its subject or part of its explanation. Allowing
+one imperfect sample leaves room for an awkward boundary; allowing two would
+mean too many sampled chunks lack necessary context.
 
 **How to test:** Save the five printed chunks with their sources and function
 name. For each, compare its boundaries with the source and mark all three checks:
@@ -87,10 +88,11 @@ the correct requested fact, include the question's `expects` phrase (ignoring
 case and repeated whitespace), and contain no factual claim unsupported by the
 retrieved chunks. An in-scope refusal counts as a failure.
 
-**Why this target:** Laundry prices, dining wait times, and administrative rules
-must retain their details to be useful. Requiring three consistent answers for
-four questions checks reliability while allowing one difficult question; accepting
-one lucky answer would hide variation, while five of five would permit none.
+**Why this target:** Users need accurate and consistent information because
+incorrect prices, wait times, or administrative requirements could affect their
+decisions. I allow one question to fail so the target tolerates one difficult
+question while requiring consistent success on the others; allowing more would
+leave too much of this small test set unreliable.
 
 **How to test:** Compare each of the 15 answers with its question and retrieved
 context. Check the expected phrase, the correctness of the requested fact, and
