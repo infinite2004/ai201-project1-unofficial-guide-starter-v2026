@@ -34,6 +34,8 @@ you a scorer; you'd learn nothing from it.
 
 import argparse
 import datetime as dt
+import json
+from dataclasses import asdict
 import sys
 from pathlib import Path
 
@@ -126,10 +128,18 @@ def main():
                     "sources": sorted({r.source for r in results}),
                     "best_distance": decision.best_distance,
                     "gate_passed": decision.passed,
+                    "expects": expects,
+                    "phrase_passed": passed,
+                    "results": [asdict(result) for result in results],
                 }
             )
 
         rows.append({"question": question, "expects": expects, "runs": run_results})
+
+    if judge:
+        for run in range(args.runs):
+            total = sum(row["runs"][run] is True for row in rows)
+            print(f"Run {run + 1} expected-phrase total: {total}/{len(rows)}")
 
     gate_rows = check_out_of_scope(top_k, threshold, corpus, args.variant)
 
@@ -178,7 +188,7 @@ def check_out_of_scope(top_k, threshold, corpus, variant):
 
 def write_report(rows, transcript, gate_rows, args, corpus, top_k, threshold, scored):
     config.RESULTS_DIR.mkdir(exist_ok=True)
-    stamp = dt.datetime.now().strftime("%Y-%m-%d_%H%M")
+    stamp = dt.datetime.now().strftime("%Y-%m-%d_%H%M%S_%f")
     label = f"_{args.label}" if args.label else ""
     path = config.RESULTS_DIR / f"run_{stamp}{label}.md"
 
@@ -193,12 +203,16 @@ def write_report(rows, transcript, gate_rows, args, corpus, top_k, threshold, sc
         f"- Retrieval: `store.py::search`, chunks from `chunker.py::split_documents`",
         f"- Corpus: `{corpus}` (index variant `{args.variant}`)",
         f"- top-k: {top_k} · relevance cutoff: {threshold}",
+        f"- Generation model: `{config.MODEL}`; embedding model: `{config.EMBEDDING_MODEL}`",
+        f"- Chunk size: {config.CHUNK_SIZE}; body overlap: {config.CHUNK_OVERLAP}",
         f"- Runs per question: {n}, caching off",
         f"- When: {dt.datetime.now().strftime('%Y-%m-%d %H:%M')}",
         "",
         "This table is one row per QUESTION. The run log your README asks for is",
         "one row per CRITERION, so aggregate these into it — criterion 1 is how many",
         "of your questions had the answer in the retrieved chunks, and so on.",
+        "",
+        "Automated pass/fail means expected phrase present only; it is not a grounding verdict.",
         "",
         f"| Question | {run_headers} |",
         f"|---|{run_divider}|",
@@ -262,6 +276,15 @@ def write_report(rows, transcript, gate_rows, args, corpus, top_k, threshold, sc
         ]
 
     path.write_text("\n".join(lines), encoding="utf-8")
+
+    path.with_suffix(".json").write_text(json.dumps({
+        "corpus": corpus, "variant": args.variant, "top_k": top_k,
+        "threshold": threshold, "model": config.MODEL,
+        "embedding_model": config.EMBEDDING_MODEL,
+        "chunk_size": config.CHUNK_SIZE, "chunk_overlap": config.CHUNK_OVERLAP,
+        "cache": False, "rows": rows, "transcript": transcript,
+        "gate_rows": gate_rows,
+    }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     import generate as gen
 

@@ -46,6 +46,19 @@ OUT_OF_SCOPE = [
 ]
 
 
+# Slide 18: AI-drafted challenge, declared separately before evaluating it.
+# Keep the original five-question baseline intact. This is not included in
+# answered(); a future challenge run must check BOTH facts manually.
+CHALLENGE_QUESTIONS = [
+    {
+        "question": "When is the peak period at Pellew Dining Hall, and how much does a cash meal cost?",
+        "expects": "$11.75",
+        "required_facts": ["11:45 to 12:30", "$11.75"],
+        "source": "dining_pellew_dining_hall.txt",
+    },
+]
+
+
 def answered() -> list[dict]:
     """The questions you've actually filled in."""
     return [q for q in QUESTIONS if q.get("question", "").strip()]

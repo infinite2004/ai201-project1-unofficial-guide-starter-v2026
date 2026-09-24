@@ -227,52 +227,141 @@ for Unit 2 so its history remains available.
 
 # Unit 2
 
-<!-- These sections get ADDED to what's already above. Don't delete or rewrite
-     unit 1 — the point is that someone can see what you said before you knew
-     how it went. -->
+## Slides 13–29: evaluation before improvements
+
+Completed with Codex assistance on September 23, 2026. Codex wrote the scorer,
+ran the evaluation, and reviewed all 15 answers against their retrieved chunks.
+These are AI-assisted judgments, not an independent student or peer review.
+The Unit 1 text above remains a historical record; its statement that Unit 2
+has not run was true before this section was added.
+
+[Slide-by-slide actions and attention items](results/slides-13-29-review.md).
 
 ## Run Log — Before
 
-<!-- Your five criteria, three runs each. `python run_eval.py --label before`
-     runs the questions, puts the OUT_OF_SCOPE ones through the gate, and
-     writes it all into results/ for you. Targets come from criteria.md; the
-     verdict column is your call.
+Command: `.venv/bin/python run_eval.py --label before`.
+Corpus: `campus_life`; default index; `all-MiniLM-L6-v2` embeddings;
+`gemini-3.5-flash-lite` generation; chunk target 400 characters, zero body
+overlap; top-k 4; cosine-distance cutoff 0.69. The 15 answers were uncached
+and used 15 model calls, 7,730 reported tokens (7,215 input, 515 output).
 
-     Criterion 3 is measured in one deterministic pass rather than three, so
-     the same number goes in all three run columns. That's correct, not lazy.
-
-     Milestone 1. -->
+Original targets in `criteria.md` are unchanged. Counts below are per criterion,
+not the scorer's per-question table. Criterion 2 requires all 15 answers to cite
+at least one retrieved filename. Criterion 5 requires at least four questions
+to pass **all three** runs, including factual-support review.
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the correct subject's answer | ≥4/5 questions | 5/5 | 5/5 | 5/5 | MET |
+| 2. Answer names a retrieved source | Every answer (15/15 overall) | 5/5 | 5/5 | 5/5 | MET |
+| 3. Gate stops out-of-corpus questions | ≥4/5 questions | 5/5* | 5/5* | 5/5* | MET |
+| 4. Complete, bounded, self-contained sample chunks | ≥4/5 chunks | 5/5* | 5/5* | 5/5* | MET |
+| 5. Correct expected fact, no unsupported claims | ≥4/5 questions across all three runs | 5/5 | 5/5 | 5/5 | MET |
 
-<!-- Underneath, paste the REAL output for each criterion from one of your
-     runs — the actual text your system produced, not a description of it.
-     Name the file and function that produced it. -->
+*Gate and chunk inspection were each measured once; the repeated cells denote
+one deterministic measurement, not three independent experiments. Retrieval
+was captured on every answer run, and the returned chunks and distances were
+identical for each question across all three runs. Generated wording varied,
+but none of the measured answer scores varied.
+
+Evidence: [all 15 actual answers](results/run_2026-09-23_203653_702014_before.md),
+[full retrieved text and machine-readable results](results/run_2026-09-23_203653_702014_before.json),
+[five freshly printed chunks](results/unit-2-chunks.txt).
+The gate run records five rejections. The existing
+[actual pipeline refusal checks](results/milestone-4-refusals.json) additionally
+verify the exact refusal and zero generation calls at this same cutoff;
+`app.py::ask_pipeline` returns `gate.REFUSAL` before calling generation.
+
+### Real output supporting the criteria
+
+Criterion 1 — actual rank-one text from `store.py::search`,
+`admin_withdrawal_deadline.txt#0`, produced by `chunker.py::split_documents`:
+
+```text
+On the withdrawal deadline
+
+Withdrawal is a different thing from dropping and has a different date. Dropping ends at week six. Withdrawal runs to week ten, requires an adviser signature, and puts a W on the transcript that doesn't affect GPA. The two dates appear on different pages of the registrar's site and this catches people every year.
+```
+
+Criteria 2 and 5 — actual run-one output from
+`generate.py::answer_from_chunks`, captured by `run_eval.py::run_once`:
+
+```text
+An adviser signature is required to withdraw from a course (admin_withdrawal_deadline.txt).
+```
+
+Criterion 3 — actual gate output printed by `run_eval.py::check_out_of_scope`:
+
+```text
+refused  (best distance 0.825)  What is the capital of Mongolia?
+refused  (best distance 0.923)  How do I change the oil in a diesel engine?
+refused  (best distance 0.886)  Who won the 1994 World Cup?
+refused  (best distance 0.844)  What is the recommended dosage of ibuprofen for a headache?
+refused  (best distance 0.891)  How do I write a for loop in Rust?
+-> gate refused 5 of 5
+```
+
+Criterion 4 — freshly printed chunk 3 from `app.py::cmd_chunks`, source
+`course_math_220_workload.txt#0`, produced by `chunker.py::split_documents`:
+
+```text
+Workload for MATH 220 Linear Algebra
+
+People keep asking so: 6 to 8 hours a week, almost all of it on problem sets. That's real time, not optimistic time.
+
+It's front-loaded — the first month is heavier than the rest, partly because you're learning the format.
+```
 
 ## Verdicts
 
-<!-- MET or MISSED for each of the five, against the target you wrote last
-     unit — not a new one. Plus a sentence on how you decided. That sentence
-     matters most where it was close.
-
-     If your target said 4 of 5 and your runs came out 4, 3, 4, that's a MISS.
-     The target has to hold, not show up occasionally.
-
-     Milestone 2. -->
-
 | # | Criterion | Verdict | How I decided |
 |---|---|---|---|
-| 1 |  |  |  |
-| 2 |  |  |  |
-| 3 |  |  |  |
-| 4 |  |  |  |
-| 5 |  |  |  |
+| 1 | Answer-bearing retrieval | MET | Each question's rank-one chunk directly states the requested fact about the correct subject; 5/5 on every run. |
+| 2 | Source attribution | MET | All 15 answer texts name an actual retrieved filename; a separate sources list was not counted. |
+| 3 | Out-of-corpus gate | MET | All five distinct questions were rejected at 0.69; the unchanged pipeline returns the exact refusal before generation. |
+| 4 | Chunk completeness and subject | MET | Each of five samples contains a complete factual sentence, matches source sentence/paragraph boundaries, and explicitly names its subject. |
+| 5 | Correctness, expected phrase, grounding | MET | All 15 contain the original phrase and correct fact. Codex read every claim against the corresponding context; no unsupported additions were found. All five questions pass all three runs. |
+
+### Review details and limitations
+
+| Question | Correct evidence | Review of all three answers |
+|---|---|---|
+| Lottery priority | `admin_housing_lottery.txt#0`: accumulated credit hours, then random ties | All specify credit hours for juniors/seniors; no invented priority rule. |
+| Withdrawal signature | `admin_withdrawal_deadline.txt#0`: adviser signature | All specify adviser signature; no additional procedural claims. |
+| Pellew peak wait | `dining_pellew_dining_hall_followup.txt#0` and main post: 12 to 18 minutes | All preserve Pellew's range rather than another hall's range. |
+| Morrow wash price | `housing_morrow_house.txt#1` and laundry post: $1.50 wash | All specify $1.50 for washing, not the $1.25 dryer price. |
+| Morrow laundry mornings | `housing_morrow_house_laundry.txt#0`: Tuesday or Wednesday morning | All preserve the days and time of day; no additional claim. |
+
+For criterion 4, the five samples are the add/drop policy, CS 210 course post,
+MATH 220 workload, Ridgeway follow-up, and Morrow housing post. All name their
+subject in the retained title. The CS 210 and Morrow excerpts end at complete
+paragraphs before omitted paragraphs; the other three are complete posts.
+Their full text is saved above in the evidence link and in Unit 1's Sample Chunks.
+
+`scorer.py::judge(question, expects, answer, results)` tests only whether the
+nonempty expected phrase appears in the answer, ignoring case and repeated
+whitespace. It does not evaluate factual support, citation correctness, negation,
+or whether a number belongs to the right location. A fabricated answer such as
+"$1.50. Every student gets free detergent." passes that automated check.
+Conversely, "12–18 minutes" is semantically equivalent to "12 to 18 minutes"
+but fails the literal check. These are synthetic examples, not observed model
+outputs. Both limitations are demonstrated in the scorer tests.
+
+There was no close numerical miss in this run. A hypothetical 4/5, 3/5, 4/5
+would be MISSED under a 4/5 target because the target must hold on every run.
+For criterion 5, even three counts of 4/5 would require checking that the same
+four questions passed every run. Here all five did.
+
+No criterion was revised: the originals are measurable and no target was
+lowered. Any future measurement revision must be appended under its original
+with a reason; a disappointing result is not grounds to lower a target.
+
+These five questions were already used for Unit 1 calibration. Passing them is
+limited evidence of generalization. `CHALLENGE_QUESTIONS` in `questions.py`
+adds an unrun two-fact Pellew question with expected facts declared in advance.
+It asks for both the peak period and cash price, increasing the risk of confusing
+wait duration with time of day or using a nearby hall's facts. It is separate
+from the original five and does not change this baseline's denominator.
 
 ## Diagnoses
 
